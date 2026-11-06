@@ -1,28 +1,35 @@
+/*
+ * rat - clone of a cat utility by Alex Larin
+*/
 #include <stdio.h>
-#include <fcntl.h>
-#include <unistd.h>
-//       ssize_t read(size_t count; int fd, void buf[count], size_t count);
 
-int main() {
-	char *filename = "test.txt";
-	printf("Reading %s\n", filename);
+void printStream(FILE* fp);
 
-	int fd = open(filename, O_RDONLY);
+int main(int argc, char *argv[]) {
+	if (argc == 1) {
+		printStream(stdin);
+		return 0;
+	} 
 
-	unsigned long word;
-	ssize_t nr;
+	for (int i = 1; i < argc; i++)
+	{
+		FILE* fp = fopen(argv[i], "r");
 
-	nr = read(fd, &word, sizeof(unsigned long));
-	if (nr == -1) {
-		fprintf(stderr, "Error occured while reading file\n");
-		return 1;
+		if (fp == NULL) {
+			fprintf(stderr, "%s: No such file or directory\n", argv[i]);
+			return 1;
+		}
+
+		printStream(fp);
+	
+		fclose(fp);
 	}
+}
 
-	printf("%ld bytes is read\n", nr);
-	printf("%ld\n", word);
-
-	close(fd);
-
-	return 0;
+void printStream(FILE* fp) {
+	int c;
+	while ((c = fgetc(fp)) != EOF) {
+		printf("%c", c);
+	}
 }
 
